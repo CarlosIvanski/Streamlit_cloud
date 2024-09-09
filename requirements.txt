@@ -1,7 +1,0 @@
-streamlit
-pandas
-openpyxl
-
-git add requirements.txt
-git commit -m "Adiciona openpyxl ao requirements.txt"
-git push origin main  # ou a branch que você estiver usando
