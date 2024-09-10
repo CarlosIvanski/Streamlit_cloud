@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import io
-import openpyxl
 
 # Título do dashboard
 st.title("Dashboard de Disponibilidade")
