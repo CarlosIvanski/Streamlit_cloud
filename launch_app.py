@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import io
 
 # Título do dashboard
 st.title("Dashboard de Disponibilidade")
@@ -23,6 +22,10 @@ unidades = ['Satélite', 'Vicentina', 'Jardim', 'Online']
 # Inicializa o session state se não estiver definido
 if 'disponibilidade' not in st.session_state:
     st.session_state.disponibilidade = {nome: {} for nome in nomes_iniciais}
+
+# Inicializa um DataFrame no session state para armazenar as respostas
+if 'df_disponibilidade' not in st.session_state:
+    st.session_state.df_disponibilidade = pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações'])
 
 # Tabela de disponibilidade e checkboxes por unidade
 st.subheader("Tabela de Disponibilidade:")
@@ -151,40 +154,17 @@ def converter_para_dataframe(dados):
     return pd.DataFrame(registros)
 
 # Converter os dados coletados para um DataFrame
-df = converter_para_dataframe(st.session_state.disponibilidade)
+df_novo = converter_para_dataframe(st.session_state.disponibilidade)
 
-# Botão para exportar os dados para Excel
-st.subheader("Exportar Dados para Excel")
-if st.button("Exportar para Excel"):
-    # Usar um BytesIO buffer para evitar problemas com diretórios
-    buffer = io.BytesIO()
-    df.to_excel(buffer, index=False, engine='openpyxl')
-    buffer.seek(0)
-    
-    # Streamlit download button
-    st.download_button(
-        label="Baixar Excel",
-        data=buffer,
-        file_name="disponibilidade_professores.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+# Botão para salvar os dados na tabela em tempo real
+if st.button("Salvar dados"):
+    st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo]).drop_duplicates().reset_index(drop=True)
+    st.success("Dados salvos com sucesso!")
 
-# Botão para exportar os dados para CSV
-st.subheader("Baixar Relatório de Seleções (CSV)")
-csv = df.to_csv(index=False)
-st.download_button(label="Baixar Relatório CSV", data=csv, file_name="relatorio_selecoes.csv", mime="text/csv")
+# Exibir a tabela com os dados salvos
+st.subheader("Tabela de Disponibilidade Atualizada")
+st.dataframe(st.session_state.df_disponibilidade)
 
-# Fase 2 - Visualização de Horários dos Professores
-
-st.title("Fase 2: Visualização de Horários dos Professores")
-
-# Upload do arquivo Excel
-uploaded_file = st.file_uploader("Carregue o arquivo Excel", type=["xlsx", "xls"])
-
-if uploaded_file:
-    # Lendo o arquivo Excel com Pandas
-    df_excel = pd.read_excel(uploaded_file)
-    
-    # Exibindo o DataFrame no Streamlit
-    st.subheader("Tabela de Alocação")
-    st.dataframe(df_excel)
+# Exportar os dados para CSV
+csv = st.session_state.df_disponibilidade.to_csv(index=False).encode('utf-8')
+st.download_button("Baixar CSV", data=csv, file_name="disponibilidade.csv", mime='text/csv')
