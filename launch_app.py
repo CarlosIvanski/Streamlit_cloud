@@ -31,8 +31,17 @@ st.title("Dashboard de Disponibilidade")
 nome_preenchedor = st.text_input("Digite seu nome:")
 
 # Coletando a data e hora da modificação
-data_modificacao = st.date_input("Data da modificação", value=datetime.today())
-hora_modificacao = st.time_input("Hora da modificação", value=datetime.now().time())
+if 'data_modificacao' not in st.session_state:
+    st.session_state.data_modificacao = datetime.today().date()
+if 'hora_modificacao' not in st.session_state:
+    st.session_state.hora_modificacao = datetime.now().time()
+
+data_modificacao = st.date_input("Data da modificação", value=st.session_state.data_modificacao)
+hora_modificacao = st.time_input("Hora da modificação", value=st.session_state.hora_modificacao)
+
+# Atualizar o session state com os novos valores
+st.session_state.data_modificacao = data_modificacao
+st.session_state.hora_modificacao = hora_modificacao
 
 # Garantir que um nome seja fornecido
 if nome_preenchedor:
