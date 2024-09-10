@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
-import io  # Importar o módulo io
+import io
 from datetime import datetime
 
 # Função para carregar os dados de um arquivo CSV
@@ -22,7 +22,8 @@ def deletar_linha(index):
     st.success(f"Linha {index} deletada com sucesso!")
 
 # Carregar os dados salvos (se houver) ao iniciar a aplicação
-st.session_state.df_disponibilidade = carregar_dados()
+if 'df_disponibilidade' not in st.session_state:
+    st.session_state.df_disponibilidade = carregar_dados()
 
 # Título do dashboard
 st.title("Dashboard de Disponibilidade")
@@ -54,7 +55,7 @@ if 'disponibilidade' not in st.session_state:
 st.subheader("Tabela de Disponibilidade:")
 
 # Define a largura das colunas
-col_widths = [1, 1.5, 1, 1.5, 1, 1.5, 2]  # Reduzindo o tamanho das colunas para ajustar o layout
+col_widths = [1, 1.5, 1, 1.5, 1, 1.5, 2]
 
 # Adicionando CSS para melhorar a visualização
 st.markdown(
@@ -62,8 +63,8 @@ st.markdown(
     <style>
     .checkbox-no-wrap {
         display: flex;
-        flex-direction: column;  /* Mantém os checkboxes organizados em coluna */
-        gap: 2px;  /* Reduzindo o espaçamento entre os checkboxes */
+        flex-direction: column;
+        gap: 2px;
     }
     .dataframe {
         border-collapse: collapse;
@@ -101,7 +102,6 @@ for i, nome_inicial in enumerate(nomes_iniciais):
 
     with cols[1]:
         st.write("Unidades")
-        # Adicionar checkboxes para cada unidade
         for unidade in unidades:
             st.session_state.disponibilidade[nome_professor][unidade] = st.checkbox(f"{unidade}", 
                 value=st.session_state.disponibilidade[nome_professor].get(unidade, False), 
@@ -109,14 +109,12 @@ for i, nome_inicial in enumerate(nomes_iniciais):
 
     with cols[2]:
         st.write("Carro")
-        # Adicionar checkbox para o carro
         st.session_state.disponibilidade[nome_professor]['Carro'] = st.checkbox("Tem carro", 
             value=st.session_state.disponibilidade[nome_professor].get('Carro', False), 
             key=f"{nome_professor}_carro")
 
     with cols[3]:
         st.write("Máquina")
-        # Adicionar checkboxes para selecionar múltiplas máquinas
         maquinas = {}
         with st.container():
             st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
@@ -134,7 +132,6 @@ for i, nome_inicial in enumerate(nomes_iniciais):
 
     with cols[4]:
         st.write("Disponibilidade")
-        # Adicionar checkboxes para cada período
         periodos = ['Manhã', 'Tarde', 'Noite', 'Sábado']
         disponibilidade_horarios = {}
         with st.container():
@@ -148,7 +145,6 @@ for i, nome_inicial in enumerate(nomes_iniciais):
 
     with cols[5]:
         st.write("Módulo")
-        # Adicionar checkboxes para as novas opções: Stage 1, VIP, CONVERSATION e MBA
         modulo_opcoes = {}
         with st.container():
             st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
@@ -169,7 +165,6 @@ for i, nome_inicial in enumerate(nomes_iniciais):
 
     with cols[6]:
         st.write("Observações")
-        # Adicionar uma caixa de texto para observações
         observacoes = st.text_area("Observações", 
             value=st.session_state.disponibilidade[nome_professor].get('Observações', ''), 
             key=f"{nome_professor}_observacoes")
@@ -186,10 +181,10 @@ def converter_para_dataframe(dados, nome_usuario, data, hora):
             'Máquinas': ', '.join(detalhes['Máquina']),
             'Disponibilidade': ', '.join(detalhes['Disponibilidade']),
             'Módulo': ', '.join(detalhes['Modulo']),
-            'Observações': detalhes.get('Observações', ''),  # Incluindo observações
-            'Nome do Preenchendor': nome_usuario,  # Nome do usuário
-            'Data': data.strftime('%Y-%m-%d'),  # Data da modificação
-            'Hora': hora.strftime('%H:%M')  # Hora da modificação
+            'Observações': detalhes.get('Observações', ''),
+            'Nome do Preenchendor': nome_usuario,
+            'Data': data.strftime('%Y-%m-%d'),
+            'Hora': hora.strftime('%H:%M')
         }
         registros.append(registro)
     return pd.DataFrame(registros)
@@ -211,20 +206,17 @@ for i, row in st.session_state.df_disponibilidade.iterrows():
     cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
     for j, value in enumerate(row):
         cols[j].write(value)
-    # Adicionar botão de deletar
     if cols[len(row)].button("Deletar", key=f"delete_{i}"):
         deletar_linha(i)
 
 # Botão para exportar os dados para Excel
 st.subheader("Exportar Dados para Excel")
 if st.button("Exportar para Excel"):
-    # Usar um BytesIO buffer para evitar problemas com diretórios
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
         st.session_state.df_disponibilidade.to_excel(writer, index=False, sheet_name='Disponibilidade')
     buffer.seek(0)
     
-    # Streamlit download button
     st.download_button(
         label="Baixar Excel",
         data=buffer,
