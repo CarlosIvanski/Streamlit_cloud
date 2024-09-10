@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-# Função para carregar dados de um arquivo CSV
+# Função para carregar os dados de um arquivo CSV
 def carregar_dados():
     if os.path.exists("disponibilidade.csv"):
         return pd.read_csv("disponibilidade.csv")
@@ -12,6 +12,12 @@ def carregar_dados():
 # Função para salvar dados em um arquivo CSV
 def salvar_dados(df):
     df.to_csv("disponibilidade.csv", index=False)
+
+# Função para deletar uma linha específica
+def deletar_linha(index):
+    st.session_state.df_disponibilidade = st.session_state.df_disponibilidade.drop(index).reset_index(drop=True)
+    salvar_dados(st.session_state.df_disponibilidade)
+    st.success(f"Linha {index} deletada com sucesso!")
 
 # Carregar os dados salvos (se houver) ao iniciar a aplicação
 st.session_state.df_disponibilidade = carregar_dados()
@@ -173,9 +179,15 @@ if st.button("Salvar dados"):
     salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
 
-# Exibir a tabela atualizada no site
+# Exibir a tabela com os botões de deletar
 st.subheader("Tabela Atualizada de Disponibilidade")
-st.dataframe(st.session_state.df_disponibilidade)
+for i, row in st.session_state.df_disponibilidade.iterrows():
+    cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
+    for j, value in enumerate(row):
+        cols[j].write(value)
+    # Adicionar botão de deletar
+    if cols[len(row)].button("Deletar", key=f"delete_{i}"):
+        deletar_linha(i)
 
 # Botão para exportar os dados para CSV
 st.subheader("Exportar Dados para CSV")
