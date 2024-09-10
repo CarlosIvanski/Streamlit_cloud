@@ -212,18 +212,26 @@ for i, row in st.session_state.df_disponibilidade.iterrows():
     if cols[len(row)].button("Deletar", key=f"delete_{i}"):
         deletar_linha(i)
 
-# Botão para exportar os dados para Excel
-st.subheader("Exportar Dados para Excel")
-if st.button("Exportar para Excel"):
-    # Usar um BytesIO buffer para evitar problemas com diretórios
-    buffer = io.BytesIO()
-    df.to_excel(buffer, index=False, engine='openpyxl')
-    buffer.seek(0)
-    
-    # Streamlit download button
-    st.download_button(
-        label="Baixar Excel",
-        data=buffer,
-        file_name="disponibilidade_professores.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+# Função para gerar e salvar relatório em CSV
+def gerar_relatorio(dados):
+    registros = []
+    for professor, detalhes in dados.items():
+        registro = {
+            'Professor': professor,
+            'Unidades': ', '.join([unidade for unidade, selecionado in detalhes.items() if unidade in unidades and selecionado]),
+            'Carro': 'Sim' if detalhes.get('Carro', False) else 'Não',
+            'Máquinas': ', '.join(detalhes['Máquina']),
+            'Disponibilidade': ', '.join(detalhes['Disponibilidade']),
+            'Módulo': ', '.join(detalhes['Modulo']),
+            'Observações': detalhes.get('Observações', '')  # Incluindo observações
+        }
+        registros.append(registro)
+    return pd.DataFrame(registros)
+
+# Gerar o DataFrame com os dados
+df_relatorio = gerar_relatorio(st.session_state.disponibilidade)
+
+# Botão para baixar o relatório em CSV
+st.subheader("Baixar Relatório de Seleções (CSV)")
+csv = df_relatorio.to_csv(index=False)
+st.download_button(label="Baixar Relatório CSV", data=csv, file_name="relatorio_selecoes.csv", mime="text/csv")
