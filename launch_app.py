@@ -19,7 +19,7 @@ if 'disponibilidade' not in st.session_state:
 st.subheader("Tabela de Disponibilidade:")
 
 # Define a largura das colunas
-col_widths = [1.5, 2, 1, 2, 1.5, 2, 2]
+col_widths = [1, 1.5, 1, 1.5, 1, 1.5, 2]  # Reduzindo o tamanho das colunas para ajustar o layout
 
 # Adicionando CSS para melhorar a visualização
 st.markdown(
@@ -28,7 +28,7 @@ st.markdown(
     .checkbox-no-wrap {
         display: flex;
         flex-direction: column;  /* Mantém os checkboxes organizados em coluna */
-        gap: 5px;  /* Adiciona espaçamento entre os checkboxes */
+        gap: 2px;  /* Reduzindo o espaçamento entre os checkboxes */
     }
     </style>
     """,
