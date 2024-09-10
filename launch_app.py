@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
-import io
+import os
 
-# Função para carregar os dados de um arquivo CSV
+# Função para carregar dados de um arquivo CSV
 def carregar_dados():
     if os.path.exists("disponibilidade.csv"):
         return pd.read_csv("disponibilidade.csv")
@@ -12,12 +12,6 @@ def carregar_dados():
 # Função para salvar dados em um arquivo CSV
 def salvar_dados(df):
     df.to_csv("disponibilidade.csv", index=False)
-
-# Função para deletar uma linha específica
-def deletar_linha(index):
-    st.session_state.df_disponibilidade = st.session_state.df_disponibilidade.drop(index).reset_index(drop=True)
-    salvar_dados(st.session_state.df_disponibilidade)
-    st.success(f"Linha {index} deletada com sucesso!")
 
 # Carregar os dados salvos (se houver) ao iniciar a aplicação
 st.session_state.df_disponibilidade = carregar_dados()
@@ -58,21 +52,6 @@ st.markdown(
         display: flex;
         flex-direction: column;  /* Mantém os checkboxes organizados em coluna */
         gap: 2px;  /* Reduzindo o espaçamento entre os checkboxes */
-    }
-    .dataframe {
-        border-collapse: collapse;
-        width: 100%;
-    }
-    .dataframe th, .dataframe td {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
-    .dataframe tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-    .dataframe th {
-        background-color: #4CAF50;
-        color: white;
     }
     </style>
     """,
@@ -194,23 +173,9 @@ if st.button("Salvar dados"):
     salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
 
-# Exibir a tabela atualizada no site com bordas e botão de deletar
+# Exibir a tabela atualizada no site
 st.subheader("Tabela Atualizada de Disponibilidade")
-
-# Função para deletar uma linha específica
-def deletar_linha(index):
-    st.session_state.df_disponibilidade = st.session_state.df_disponibilidade.drop(index).reset_index(drop=True)
-    salvar_dados(st.session_state.df_disponibilidade)
-    st.success(f"Linha {index} deletada com sucesso!")
-
-# Exibir a tabela com os botões de deletar
-for i, row in st.session_state.df_disponibilidade.iterrows():
-    cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
-    for j, value in enumerate(row):
-        cols[j].write(value)
-    # Adicionar botão de deletar
-    if cols[len(row)].button("Deletar", key=f"delete_{i}"):
-        deletar_linha(i)
+st.dataframe(st.session_state.df_disponibilidade)
 
 # Função para gerar e salvar relatório em CSV
 def gerar_relatorio(dados):
@@ -227,22 +192,3 @@ def gerar_relatorio(dados):
         }
         registros.append(registro)
     return pd.DataFrame(registros)
-
-# Gerar o DataFrame com os dados
-df_relatorio = gerar_relatorio(st.session_state.disponibilidade)
-
-# Botão para exportar os dados para Excel
-st.subheader("Exportar Dados para Excel")
-if st.button("Exportar para Excel"):
-    # Usar um BytesIO buffer para evitar problemas com diretórios
-    buffer = io.BytesIO()
-    df.to_excel(buffer, index=False, engine='openpyxl')
-    buffer.seek(0)
-    
-    # Streamlit download button
-    st.download_button(
-        label="Baixar Excel",
-        data=buffer,
-        file_name="disponibilidade_professores.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
