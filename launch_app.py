@@ -212,7 +212,18 @@ for i, row in st.session_state.df_disponibilidade.iterrows():
     if cols[len(row)].button("Deletar", key=f"delete_{i}"):
         deletar_linha(i)
 
-# Botão para exportar os dados para CSV
-st.subheader("Exportar Dados para CSV")
-csv = st.session_state.df_disponibilidade.to_csv(index=False).encode('utf-8')
-st.download_button("Baixar CSV", data=csv, file_name="disponibilidade.csv", mime='text/csv')
+# Botão para exportar os dados para Excel
+st.subheader("Exportar Dados para Excel")
+if st.button("Exportar para Excel"):
+    # Usar um BytesIO buffer para evitar problemas com diretórios
+    buffer = io.BytesIO()
+    df.to_excel(buffer, index=False, engine='openpyxl')
+    buffer.seek(0)
+    
+    # Streamlit download button
+    st.download_button(
+        label="Baixar Excel",
+        data=buffer,
+        file_name="disponibilidade_professores.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
