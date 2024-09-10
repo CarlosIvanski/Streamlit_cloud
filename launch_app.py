@@ -19,7 +19,7 @@ if 'disponibilidade' not in st.session_state:
 st.subheader("Tabela de Disponibilidade:")
 
 # Define a largura das colunas
-col_widths = [1.5, 2, 1, 2, 1.5, 2]
+col_widths = [1.5, 2, 1, 2, 1.5, 2, 2]
 
 # Adicionando CSS para melhorar a visualização
 st.markdown(
@@ -35,12 +35,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Loop para cada pessoa (linha da tabela)
 for i, nome_inicial in enumerate(nomes_iniciais):
-    cols = st.columns(col_widths)  # Ajuste das larguras das colunas
+    cols = st.columns(col_widths)
 
     with cols[0]:
-        # Editar nome do professor diretamente na tabela
         nome_professor = st.text_input(f"Nome do professor {i + 1}:", nome_inicial, key=f"nome_{i}")
 
     # Atualiza o nome do professor no session state
@@ -119,6 +117,14 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Modulo'] = [key for key, value in modulo_opcoes.items() if value]
 
+    with cols[6]:
+        st.write("Observações")
+        # Adicionar uma caixa de texto para observações
+        observacoes = st.text_area("Observações", 
+            value=st.session_state.disponibilidade[nome_professor].get('Observações', ''), 
+            key=f"{nome_professor}_observacoes")
+        st.session_state.disponibilidade[nome_professor]['Observações'] = observacoes
+
 # Função para converter os dados para DataFrame
 def converter_para_dataframe(dados):
     registros = []
@@ -129,7 +135,8 @@ def converter_para_dataframe(dados):
             'Carro': 'Sim' if detalhes.get('Carro', False) else 'Não',
             'Máquinas': ', '.join(detalhes['Máquina']),
             'Disponibilidade': ', '.join(detalhes['Disponibilidade']),
-            'Módulo': ', '.join(detalhes['Modulo'])  # Alterado para "Módulo" sem o número 1
+            'Módulo': ', '.join(detalhes['Modulo']),
+            'Observações': detalhes.get('Observações', '')  # Incluindo observações
         }
         registros.append(registro)
     return pd.DataFrame(registros)
@@ -153,9 +160,9 @@ if st.button("Exportar para Excel"):
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-    # Fase 2 -
+# Fase 2 -
 
-    st.title("Fase 2: Visualização de Horários dos Professores")
+st.title("Fase 2: Visualização de Horários dos Professores")
 
 # Upload do arquivo Excel
 uploaded_file = st.file_uploader("Carregue o arquivo Excel", type=["xlsx", "xls"])
