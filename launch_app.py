@@ -202,13 +202,18 @@ st.markdown(
 )
 st.dataframe(st.session_state.df_disponibilidade.style.set_table_attributes('class="dataframe"'))
 
-# Upload do arquivo Excel
-uploaded_file = st.file_uploader("Carregue o arquivo Excel", type=["xlsx", "xls"])
-
-if uploaded_file:
-    # Lendo o arquivo Excel com Pandas
-    df_excel = pd.read_excel(uploaded_file)
+# Botão para exportar os dados para Excel
+st.subheader("Exportar Dados para Excel")
+if st.button("Exportar para Excel"):
+    # Usar um BytesIO buffer para evitar problemas com diretórios
+    buffer = io.BytesIO()
+    df.to_excel(buffer, index=False, engine='openpyxl')
+    buffer.seek(0)
     
-    # Exibindo o DataFrame no Streamlit
-    st.subheader("Tabela de Alocação")
-    st.dataframe(df_excel)
+    # Streamlit download button
+    st.download_button(
+        label="Baixar Excel",
+        data=buffer,
+        file_name="disponibilidade_professores.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
