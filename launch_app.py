@@ -59,6 +59,21 @@ st.markdown(
         flex-direction: column;  /* Mantém os checkboxes organizados em coluna */
         gap: 2px;  /* Reduzindo o espaçamento entre os checkboxes */
     }
+    .dataframe {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .dataframe th, .dataframe td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    .dataframe tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    .dataframe th {
+        background-color: #4CAF50;
+        color: white;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -179,17 +194,21 @@ if st.button("Salvar dados"):
     salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
 
-# Exibir a tabela com os botões de deletar
+# Exibir a tabela atualizada no site com bordas
 st.subheader("Tabela Atualizada de Disponibilidade")
-for i, row in st.session_state.df_disponibilidade.iterrows():
-    cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
-    for j, value in enumerate(row):
-        cols[j].write(value)
-    # Adicionar botão de deletar
-    if cols[len(row)].button("Deletar", key=f"delete_{i}"):
-        deletar_linha(i)
+st.markdown(
+    '<style> .dataframe { border-collapse: collapse; width: 100%; } .dataframe th, .dataframe td { border: 1px solid #ddd; padding: 8px; } .dataframe tr:nth-child(even) { background-color: #f2f2f2; } .dataframe th { background-color: #4CAF50; color: white; } </style>', 
+    unsafe_allow_html=True
+)
+st.dataframe(st.session_state.df_disponibilidade.style.set_table_attributes('class="dataframe"'))
 
-# Botão para exportar os dados para CSV
-st.subheader("Exportar Dados para CSV")
-csv = st.session_state.df_disponibilidade.to_csv(index=False).encode('utf-8')
-st.download_button("Baixar CSV", data=csv, file_name="disponibilidade.csv", mime='text/csv')
+# Upload do arquivo Excel
+uploaded_file = st.file_uploader("Carregue o arquivo Excel", type=["xlsx", "xls"])
+
+if uploaded_file:
+    # Lendo o arquivo Excel com Pandas
+    df_excel = pd.read_excel(uploaded_file)
+    
+    # Exibindo o DataFrame no Streamlit
+    st.subheader("Tabela de Alocação")
+    st.dataframe(df_excel)
