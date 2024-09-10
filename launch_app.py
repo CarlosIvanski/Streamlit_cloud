@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import io
+import openpyxl
 
 # Título do dashboard
 st.title("Dashboard de Disponibilidade")
@@ -55,20 +56,16 @@ for i, nome_inicial in enumerate(nomes_iniciais):
         st.write("Unidades")
         # Adicionar checkboxes para cada unidade
         for unidade in unidades:
-            st.session_state.disponibilidade[nome_professor][unidade] = st.checkbox(
-                f"{unidade}", 
+            st.session_state.disponibilidade[nome_professor][unidade] = st.checkbox(f"{unidade}", 
                 value=st.session_state.disponibilidade[nome_professor].get(unidade, False), 
-                key=f"{nome_professor}_{unidade}"
-            )
+                key=f"{nome_professor}_{unidade}")
 
     with cols[2]:
         st.write("Carro")
         # Adicionar checkbox para o carro
-        st.session_state.disponibilidade[nome_professor]['Carro'] = st.checkbox(
-            "Tem carro", 
+        st.session_state.disponibilidade[nome_professor]['Carro'] = st.checkbox("Tem carro", 
             value=st.session_state.disponibilidade[nome_professor].get('Carro', False), 
-            key=f"{nome_professor}_carro"
-        )
+            key=f"{nome_professor}_carro")
 
     with cols[3]:
         st.write("Máquina")
@@ -76,21 +73,15 @@ for i, nome_inicial in enumerate(nomes_iniciais):
         maquinas = {}
         with st.container():
             st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-            maquinas['Notebook'] = st.checkbox(
-                "Notebook", 
+            maquinas['Notebook'] = st.checkbox("Notebook", 
                 value='Notebook' in st.session_state.disponibilidade[nome_professor].get('Máquina', []), 
-                key=f"{nome_professor}_notebook"
-            )
-            maquinas['Computador'] = st.checkbox(
-                "Computador", 
+                key=f"{nome_professor}_notebook")
+            maquinas['Computador'] = st.checkbox("Computador", 
                 value='Computador' in st.session_state.disponibilidade[nome_professor].get('Máquina', []), 
-                key=f"{nome_professor}_computador"
-            )
-            maquinas['NDA'] = st.checkbox(
-                "NDA", 
+                key=f"{nome_professor}_computador")
+            maquinas['NDA'] = st.checkbox("NDA", 
                 value='NDA' in st.session_state.disponibilidade[nome_professor].get('Máquina', []), 
-                key=f"{nome_professor}_nda"
-            )
+                key=f"{nome_professor}_nda")
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Máquina'] = [key for key, value in maquinas.items() if value]
 
@@ -102,11 +93,9 @@ for i, nome_inicial in enumerate(nomes_iniciais):
         with st.container():
             st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
             for periodo in periodos:
-                disponibilidade_horarios[periodo] = st.checkbox(
-                    periodo, 
+                disponibilidade_horarios[periodo] = st.checkbox(periodo, 
                     value=periodo in st.session_state.disponibilidade[nome_professor].get('Disponibilidade', []), 
-                    key=f"{nome_professor}_{periodo}"
-                )
+                    key=f"{nome_professor}_{periodo}")
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Disponibilidade'] = [key for key, value in disponibilidade_horarios.items() if value]
 
@@ -116,26 +105,18 @@ for i, nome_inicial in enumerate(nomes_iniciais):
         modulo_opcoes = {}
         with st.container():
             st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-            modulo_opcoes['Stage 1'] = st.checkbox(
-                "Stage 1", 
+            modulo_opcoes['Stage 1'] = st.checkbox("Stage 1", 
                 value='Stage 1' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                key=f"{nome_professor}_stage1"
-            )
-            modulo_opcoes['VIP'] = st.checkbox(
-                "VIP", 
+                key=f"{nome_professor}_stage1")
+            modulo_opcoes['VIP'] = st.checkbox("VIP", 
                 value='VIP' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                key=f"{nome_professor}_vip"
-            )
-            modulo_opcoes['CONVERSATION'] = st.checkbox(
-                "CONVERSATION", 
+                key=f"{nome_professor}_vip")
+            modulo_opcoes['CONVERSATION'] = st.checkbox("CONVERSATION", 
                 value='CONVERSATION' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                key=f"{nome_professor}_conversation"
-            )
-            modulo_opcoes['MBA'] = st.checkbox(
-                "MBA", 
+                key=f"{nome_professor}_conversation")
+            modulo_opcoes['MBA'] = st.checkbox("MBA", 
                 value='MBA' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                key=f"{nome_professor}_mba"
-            )
+                key=f"{nome_professor}_mba")
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Modulo'] = [key for key, value in modulo_opcoes.items() if value]
 
@@ -182,7 +163,7 @@ uploaded_file = st.file_uploader("Carregue o arquivo Excel", type=["xlsx", "xls"
 
 if uploaded_file:
     # Lendo o arquivo Excel com Pandas
-    df_excel = pd.read_excel(uploaded_file, engine='openpyxl')
+    df_excel = pd.read_excel(uploaded_file)
     
     # Exibindo o DataFrame no Streamlit
     st.subheader("Tabela de Alocação")
