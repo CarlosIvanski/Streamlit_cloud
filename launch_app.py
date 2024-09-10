@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
+import io
 
 # Função para carregar os dados de um arquivo CSV
 def carregar_dados():
@@ -231,7 +232,18 @@ def gerar_relatorio(dados):
 # Gerar o DataFrame com os dados
 df_relatorio = gerar_relatorio(st.session_state.disponibilidade)
 
-# Botão para baixar o relatório em CSV
-st.subheader("Baixar Relatório de Seleções (CSV)")
-csv = df_relatorio.to_csv(index=False)
-st.download_button(label="Baixar Relatório CSV", data=csv, file_name="relatorio_selecoes.csv", mime="text/csv")
+# Botão para exportar os dados para Excel
+st.subheader("Exportar Dados para Excel")
+if st.button("Exportar para Excel"):
+    # Usar um BytesIO buffer para evitar problemas com diretórios
+    buffer = io.BytesIO()
+    df.to_excel(buffer, index=False, engine='openpyxl')
+    buffer.seek(0)
+    
+    # Streamlit download button
+    st.download_button(
+        label="Baixar Excel",
+        data=buffer,
+        file_name="disponibilidade_professores.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
