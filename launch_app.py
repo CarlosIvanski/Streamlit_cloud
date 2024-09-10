@@ -194,8 +194,9 @@ if st.button("Salvar dados"):
     salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
 
-# Exibir a tabela atualizada no site com bordas e botão de deletar
+# Exibir a tabela atualizada no site
 st.subheader("Tabela Atualizada de Disponibilidade")
+st.dataframe(st.session_state.df_disponibilidade)
 
 # Função para deletar uma linha específica
 def deletar_linha(index):
