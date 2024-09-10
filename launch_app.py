@@ -1,5 +1,20 @@
 import streamlit as st
 import pandas as pd
+import os
+
+# Função para carregar dados de um arquivo CSV
+def carregar_dados():
+    if os.path.exists("disponibilidade.csv"):
+        return pd.read_csv("disponibilidade.csv")
+    else:
+        return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações'])
+
+# Função para salvar dados em um arquivo CSV
+def salvar_dados(df):
+    df.to_csv("disponibilidade.csv", index=False)
+
+# Carregar os dados salvos (se houver) ao iniciar a aplicação
+st.session_state.df_disponibilidade = carregar_dados()
 
 # Título do dashboard
 st.title("Dashboard de Disponibilidade")
@@ -22,10 +37,6 @@ unidades = ['Satélite', 'Vicentina', 'Jardim', 'Online']
 # Inicializa o session state se não estiver definido
 if 'disponibilidade' not in st.session_state:
     st.session_state.disponibilidade = {nome: {} for nome in nomes_iniciais}
-
-# Inicializa um DataFrame no session state para armazenar as respostas
-if 'df_disponibilidade' not in st.session_state:
-    st.session_state.df_disponibilidade = pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações'])
 
 # Tabela de disponibilidade e checkboxes por unidade
 st.subheader("Tabela de Disponibilidade:")
@@ -159,12 +170,14 @@ df_novo = converter_para_dataframe(st.session_state.disponibilidade)
 # Botão para salvar os dados na tabela em tempo real
 if st.button("Salvar dados"):
     st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo]).drop_duplicates().reset_index(drop=True)
+    salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
 
-# Exibir a tabela com os dados salvos
-st.subheader("Tabela de Disponibilidade Atualizada")
+# Exibir a tabela atualizada no site
+st.subheader("Tabela Atualizada de Disponibilidade")
 st.dataframe(st.session_state.df_disponibilidade)
 
-# Exportar os dados para CSV
+# Botão para exportar os dados para CSV
+st.subheader("Exportar Dados para CSV")
 csv = st.session_state.df_disponibilidade.to_csv(index=False).encode('utf-8')
 st.download_button("Baixar CSV", data=csv, file_name="disponibilidade.csv", mime='text/csv')
