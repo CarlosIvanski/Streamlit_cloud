@@ -8,7 +8,7 @@ def carregar_dados():
     if os.path.exists("disponibilidade.csv"):
         return pd.read_csv("disponibilidade.csv")
     else:
-        return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações'])
+        return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações', 'Nome do Preenchendor'])
 
 # Função para salvar dados em um arquivo CSV
 def salvar_dados(df):
@@ -171,7 +171,7 @@ for i, nome_inicial in enumerate(nomes_iniciais):
         st.session_state.disponibilidade[nome_professor]['Observações'] = observacoes
 
 # Função para converter os dados para DataFrame
-def converter_para_dataframe(dados):
+def converter_para_dataframe(dados, nome_usuario):
     registros = []
     for professor, detalhes in dados.items():
         registro = {
@@ -181,13 +181,14 @@ def converter_para_dataframe(dados):
             'Máquinas': ', '.join(detalhes['Máquina']),
             'Disponibilidade': ', '.join(detalhes['Disponibilidade']),
             'Módulo': ', '.join(detalhes['Modulo']),
-            'Observações': detalhes.get('Observações', '')  # Incluindo observações
+            'Observações': detalhes.get('Observações', ''),  # Incluindo observações
+            'Nome do Preenchendor': nome_usuario  # Nome do usuário
         }
         registros.append(registro)
     return pd.DataFrame(registros)
 
 # Converter os dados coletados para um DataFrame
-df_novo = converter_para_dataframe(st.session_state.disponibilidade)
+df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor)
 
 # Botão para salvar os dados na tabela em tempo real
 if st.button("Salvar dados"):
@@ -213,7 +214,7 @@ if st.button("Exportar para Excel"):
     # Usar um BytesIO buffer para evitar problemas com diretórios
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-        df_novo.to_excel(writer, index=False, sheet_name='Disponibilidade')
+        st.session_state.df_disponibilidade.to_excel(writer, index=False, sheet_name='Disponibilidade')
     buffer.seek(0)
     
     # Streamlit download button
