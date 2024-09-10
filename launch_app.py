@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import io
+import os
 
 # Função para carregar os dados de um arquivo CSV
 def carregar_dados():
