@@ -194,13 +194,23 @@ if st.button("Salvar dados"):
     salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
 
-# Exibir a tabela atualizada no site com bordas
+# Exibir a tabela atualizada no site com bordas e botão de deletar
 st.subheader("Tabela Atualizada de Disponibilidade")
-st.markdown(
-    '<style> .dataframe { border-collapse: collapse; width: 100%; } .dataframe th, .dataframe td { border: 1px solid #ddd; padding: 8px; } .dataframe tr:nth-child(even) { background-color: #f2f2f2; } .dataframe th { background-color: #4CAF50; color: white; } </style>', 
-    unsafe_allow_html=True
-)
-st.dataframe(st.session_state.df_disponibilidade.style.set_table_attributes('class="dataframe"'))
+
+# Função para deletar uma linha específica
+def deletar_linha(index):
+    st.session_state.df_disponibilidade = st.session_state.df_disponibilidade.drop(index).reset_index(drop=True)
+    salvar_dados(st.session_state.df_disponibilidade)
+    st.success(f"Linha {index} deletada com sucesso!")
+
+# Exibir a tabela com os botões de deletar
+for i, row in st.session_state.df_disponibilidade.iterrows():
+    cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
+    for j, value in enumerate(row):
+        cols[j].write(value)
+    # Adicionar botão de deletar
+    if cols[len(row)].button("Deletar", key=f"delete_{i}"):
+        deletar_linha(i)
 
 # Botão para exportar os dados para Excel
 st.subheader("Exportar Dados para Excel")
