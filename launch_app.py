@@ -31,8 +31,17 @@ st.title("Dashboard de Disponibilidade")
 nome_preenchedor = st.text_input("Digite seu nome:")
 
 # Coletando a data e hora da modificação
-data_modificacao = st.date_input("Data da modificação", value=datetime.today())
-hora_modificacao = st.time_input("Hora da modificação", value=datetime.now().time())
+if 'data_modificacao' not in st.session_state:
+    st.session_state.data_modificacao = datetime.today().date()
+if 'hora_modificacao' not in st.session_state:
+    st.session_state.hora_modificacao = datetime.now().time()
+
+data_modificacao = st.date_input("Data da modificação", value=st.session_state.data_modificacao)
+hora_modificacao = st.time_input("Hora da modificação", value=st.session_state.hora_modificacao)
+
+# Atualizar o session state com os novos valores
+st.session_state.data_modificacao = data_modificacao
+st.session_state.hora_modificacao = hora_modificacao
 
 # Garantir que um nome seja fornecido
 if nome_preenchedor:
@@ -40,15 +49,15 @@ if nome_preenchedor:
 else:
     st.warning("Por favor, preencha seu nome para continuar.")
 
-# Nomes iniciais dos professores
-nomes_iniciais = ['Pessoa A', 'Pessoa B', 'Pessoa C', 'Pessoa D']
+# Nome do único professor (não será exibido diretamente, será usado internamente)
+nome_professor_unico = "Professor Único"
 
 # Lista de unidades
 unidades = ['Satélite', 'Vicentina', 'Jardim', 'Online']
 
 # Inicializa o session state se não estiver definido
 if 'disponibilidade' not in st.session_state:
-    st.session_state.disponibilidade = {nome: {} for nome in nomes_iniciais}
+    st.session_state.disponibilidade = {nome_professor_unico: {}}
 
 # Tabela de disponibilidade e checkboxes por unidade
 st.subheader("Tabela de Disponibilidade:")
@@ -85,95 +94,87 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-for i, nome_inicial in enumerate(nomes_iniciais):
-    cols = st.columns(col_widths)
+cols = st.columns(col_widths)
 
-    with cols[0]:
-        nome_professor = st.text_input(f"Nome do professor {i + 1}:", nome_inicial, key=f"nome_{i}")
+# Atualiza o dicionário com base no session state
+if nome_professor_unico not in st.session_state.disponibilidade:
+    st.session_state.disponibilidade[nome_professor_unico] = {}
 
-    # Atualiza o nome do professor no session state
-    if nome_professor != nome_inicial:
-        st.session_state.disponibilidade[nome_professor] = st.session_state.disponibilidade.pop(nome_inicial, {})
+with cols[0]:
+    st.write("Unidades")
+    # Adicionar checkboxes para cada unidade
+    for unidade in unidades:
+        st.session_state.disponibilidade[nome_professor_unico][unidade] = st.checkbox(f"{unidade}", 
+            value=st.session_state.disponibilidade[nome_professor_unico].get(unidade, False), 
+            key=f"{nome_professor_unico}_{unidade}")
 
-    # Atualiza o dicionário com base no session state
-    if nome_professor not in st.session_state.disponibilidade:
-        st.session_state.disponibilidade[nome_professor] = {}
+with cols[1]:
+    st.write("Carro")
+    # Adicionar checkbox para o carro
+    st.session_state.disponibilidade[nome_professor_unico]['Carro'] = st.checkbox("Tem carro", 
+        value=st.session_state.disponibilidade[nome_professor_unico].get('Carro', False), 
+        key=f"{nome_professor_unico}_carro")
 
-    with cols[1]:
-        st.write("Unidades")
-        # Adicionar checkboxes para cada unidade
-        for unidade in unidades:
-            st.session_state.disponibilidade[nome_professor][unidade] = st.checkbox(f"{unidade}", 
-                value=st.session_state.disponibilidade[nome_professor].get(unidade, False), 
-                key=f"{nome_professor}_{unidade}")
+with cols[2]:
+    st.write("Máquina")
+    # Adicionar checkboxes para selecionar múltiplas máquinas
+    maquinas = {}
+    with st.container():
+        st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
+        maquinas['Notebook'] = st.checkbox("Notebook", 
+            value='Notebook' in st.session_state.disponibilidade[nome_professor_unico].get('Máquina', []), 
+            key=f"{nome_professor_unico}_notebook")
+        maquinas['Computador'] = st.checkbox("Computador", 
+            value='Computador' in st.session_state.disponibilidade[nome_professor_unico].get('Máquina', []), 
+            key=f"{nome_professor_unico}_computador")
+        maquinas['NDA'] = st.checkbox("NDA", 
+            value='NDA' in st.session_state.disponibilidade[nome_professor_unico].get('Máquina', []), 
+            key=f"{nome_professor_unico}_nda")
+        st.markdown('</div>', unsafe_allow_html=True)
+    st.session_state.disponibilidade[nome_professor_unico]['Máquina'] = [key for key, value in maquinas.items() if value]
 
-    with cols[2]:
-        st.write("Carro")
-        # Adicionar checkbox para o carro
-        st.session_state.disponibilidade[nome_professor]['Carro'] = st.checkbox("Tem carro", 
-            value=st.session_state.disponibilidade[nome_professor].get('Carro', False), 
-            key=f"{nome_professor}_carro")
+with cols[3]:
+    st.write("Disponibilidade")
+    # Adicionar checkboxes para cada período
+    periodos = ['Manhã', 'Tarde', 'Noite', 'Sábado']
+    disponibilidade_horarios = {}
+    with st.container():
+        st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
+        for periodo in periodos:
+            disponibilidade_horarios[periodo] = st.checkbox(periodo, 
+                value=periodo in st.session_state.disponibilidade[nome_professor_unico].get('Disponibilidade', []), 
+                key=f"{nome_professor_unico}_{periodo}")
+        st.markdown('</div>', unsafe_allow_html=True)
+    st.session_state.disponibilidade[nome_professor_unico]['Disponibilidade'] = [key for key, value in disponibilidade_horarios.items() if value]
 
-    with cols[3]:
-        st.write("Máquina")
-        # Adicionar checkboxes para selecionar múltiplas máquinas
-        maquinas = {}
-        with st.container():
-            st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-            maquinas['Notebook'] = st.checkbox("Notebook", 
-                value='Notebook' in st.session_state.disponibilidade[nome_professor].get('Máquina', []), 
-                key=f"{nome_professor}_notebook")
-            maquinas['Computador'] = st.checkbox("Computador", 
-                value='Computador' in st.session_state.disponibilidade[nome_professor].get('Máquina', []), 
-                key=f"{nome_professor}_computador")
-            maquinas['NDA'] = st.checkbox("NDA", 
-                value='NDA' in st.session_state.disponibilidade[nome_professor].get('Máquina', []), 
-                key=f"{nome_professor}_nda")
-            st.markdown('</div>', unsafe_allow_html=True)
-        st.session_state.disponibilidade[nome_professor]['Máquina'] = [key for key, value in maquinas.items() if value]
+with cols[4]:
+    st.write("Módulo")
+    # Adicionar checkboxes para as novas opções: Stage 1, VIP, CONVERSATION e MBA
+    modulo_opcoes = {}
+    with st.container():
+        st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
+        modulo_opcoes['Stage 1'] = st.checkbox("Stage 1", 
+            value='Stage 1' in st.session_state.disponibilidade[nome_professor_unico].get('Modulo', []), 
+            key=f"{nome_professor_unico}_stage1")
+        modulo_opcoes['VIP'] = st.checkbox("VIP", 
+            value='VIP' in st.session_state.disponibilidade[nome_professor_unico].get('Modulo', []), 
+            key=f"{nome_professor_unico}_vip")
+        modulo_opcoes['CONVERSATION'] = st.checkbox("CONVERSATION", 
+            value='CONVERSATION' in st.session_state.disponibilidade[nome_professor_unico].get('Modulo', []), 
+            key=f"{nome_professor_unico}_conversation")
+        modulo_opcoes['MBA'] = st.checkbox("MBA", 
+            value='MBA' in st.session_state.disponibilidade[nome_professor_unico].get('Modulo', []), 
+            key=f"{nome_professor_unico}_mba")
+        st.markdown('</div>', unsafe_allow_html=True)
+    st.session_state.disponibilidade[nome_professor_unico]['Modulo'] = [key for key, value in modulo_opcoes.items() if value]
 
-    with cols[4]:
-        st.write("Disponibilidade")
-        # Adicionar checkboxes para cada período
-        periodos = ['Manhã', 'Tarde', 'Noite', 'Sábado']
-        disponibilidade_horarios = {}
-        with st.container():
-            st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-            for periodo in periodos:
-                disponibilidade_horarios[periodo] = st.checkbox(periodo, 
-                    value=periodo in st.session_state.disponibilidade[nome_professor].get('Disponibilidade', []), 
-                    key=f"{nome_professor}_{periodo}")
-            st.markdown('</div>', unsafe_allow_html=True)
-        st.session_state.disponibilidade[nome_professor]['Disponibilidade'] = [key for key, value in disponibilidade_horarios.items() if value]
-
-    with cols[5]:
-        st.write("Módulo")
-        # Adicionar checkboxes para as novas opções: Stage 1, VIP, CONVERSATION e MBA
-        modulo_opcoes = {}
-        with st.container():
-            st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-            modulo_opcoes['Stage 1'] = st.checkbox("Stage 1", 
-                value='Stage 1' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                key=f"{nome_professor}_stage1")
-            modulo_opcoes['VIP'] = st.checkbox("VIP", 
-                value='VIP' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                key=f"{nome_professor}_vip")
-            modulo_opcoes['CONVERSATION'] = st.checkbox("CONVERSATION", 
-                value='CONVERSATION' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                key=f"{nome_professor}_conversation")
-            modulo_opcoes['MBA'] = st.checkbox("MBA", 
-                value='MBA' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                key=f"{nome_professor}_mba")
-            st.markdown('</div>', unsafe_allow_html=True)
-        st.session_state.disponibilidade[nome_professor]['Modulo'] = [key for key, value in modulo_opcoes.items() if value]
-
-    with cols[6]:
-        st.write("Observações")
-        # Adicionar uma caixa de texto para observações
-        observacoes = st.text_area("Observações", 
-            value=st.session_state.disponibilidade[nome_professor].get('Observações', ''), 
-            key=f"{nome_professor}_observacoes")
-        st.session_state.disponibilidade[nome_professor]['Observações'] = observacoes
+with cols[5]:
+    st.write("Observações")
+    # Adicionar uma caixa de texto para observações
+    observacoes = st.text_area("Observações", 
+        value=st.session_state.disponibilidade[nome_professor_unico].get('Observações', ''), 
+        key=f"{nome_professor_unico}_observacoes")
+    st.session_state.disponibilidade[nome_professor_unico]['Observações'] = observacoes
 
 # Função para converter os dados para DataFrame
 def converter_para_dataframe(dados, nome_usuario, data, hora):
@@ -187,8 +188,8 @@ def converter_para_dataframe(dados, nome_usuario, data, hora):
             'Disponibilidade': ', '.join(detalhes['Disponibilidade']),
             'Módulo': ', '.join(detalhes['Modulo']),
             'Observações': detalhes.get('Observações', ''),  # Incluindo observações
-            'Nome do Preenchendor': nome_usuario,  # Nome do usuário
-            'Data': data.strftime('%Y-%m-%d'),  # Data da modificação
+            'Nome do Preenchendor': nome_usuario,
+            'Data': data.strftime('%Y-%m-%d'),
             'Hora': hora.strftime('%H:%M')  # Hora da modificação
         }
         registros.append(registro)
