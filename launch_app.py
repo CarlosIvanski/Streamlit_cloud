@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
-import io
+import io  # Importar o módulo io
 
 # Função para carregar os dados de um arquivo CSV
 def carregar_dados():
@@ -198,12 +198,6 @@ if st.button("Salvar dados"):
 # Exibir a tabela atualizada no site com bordas e botão de deletar
 st.subheader("Tabela Atualizada de Disponibilidade")
 
-# Função para deletar uma linha específica
-def deletar_linha(index):
-    st.session_state.df_disponibilidade = st.session_state.df_disponibilidade.drop(index).reset_index(drop=True)
-    salvar_dados(st.session_state.df_disponibilidade)
-    st.success(f"Linha {index} deletada com sucesso!")
-
 # Exibir a tabela com os botões de deletar
 for i, row in st.session_state.df_disponibilidade.iterrows():
     cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
@@ -218,7 +212,7 @@ st.subheader("Exportar Dados para Excel")
 if st.button("Exportar para Excel"):
     # Usar um BytesIO buffer para evitar problemas com diretórios
     buffer = io.BytesIO()
-    df.to_excel(buffer, index=False, engine='openpyxl')
+    df_novo.to_excel(buffer, index=False, engine='openpyxl')
     buffer.seek(0)
     
     # Streamlit download button
