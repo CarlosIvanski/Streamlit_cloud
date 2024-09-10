@@ -30,18 +30,9 @@ st.title("Dashboard de Disponibilidade")
 # Coletando o nome de quem preencheu o formulário
 nome_preenchedor = st.text_input("Digite seu nome:")
 
-# Supondo que você tenha uma variável para armazenar a hora selecionada
-if 'hora_selecionada' not in st.session_state:
-    st.session_state.hora_selecionada = datetime.datetime.now().time()
-
-# Exemplo de seleção de hora
-hora = st.time_input("Selecione a hora", value=st.session_state.hora_selecionada)
-
-# Atualizando a variável na sessão quando o usuário muda a seleção
-st.session_state.hora_selecionada = hora
-
-# Exibindo a hora selecionada
-st.write(f"Hora selecionada: {hora}")
+# Coletando a data e hora da modificação
+data_modificacao = st.date_input("Data da modificação", value=datetime.today())
+hora_modificacao = st.time_input("Hora da modificação", value=datetime.now().time())
 
 # Garantir que um nome seja fornecido
 if nome_preenchedor:
