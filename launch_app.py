@@ -212,7 +212,8 @@ st.subheader("Exportar Dados para Excel")
 if st.button("Exportar para Excel"):
     # Usar um BytesIO buffer para evitar problemas com diretórios
     buffer = io.BytesIO()
-    df_novo.to_excel(buffer, index=False, engine='openpyxl')
+    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+        df_novo.to_excel(writer, index=False, sheet_name='Disponibilidade')
     buffer.seek(0)
     
     # Streamlit download button
