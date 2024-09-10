@@ -5,6 +5,15 @@ import io
 # Título do dashboard
 st.title("Dashboard de Disponibilidade")
 
+# Coletando o nome de quem preencheu o formulário
+nome_preenchedor = st.text_input("Digite seu nome:")
+
+# Garantir que um nome seja fornecido
+if nome_preenchedor:
+    st.write(f"Obrigado, {nome_preenchedor}, suas respostas foram registradas!")
+else:
+    st.warning("Por favor, preencha seu nome para continuar.")
+
 # Nomes iniciais dos professores
 nomes_iniciais = ['Pessoa A', 'Pessoa B', 'Pessoa C', 'Pessoa D']
 
@@ -160,7 +169,12 @@ if st.button("Exportar para Excel"):
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-# Fase 2 -
+# Botão para exportar os dados para CSV
+st.subheader("Baixar Relatório de Seleções (CSV)")
+csv = df.to_csv(index=False)
+st.download_button(label="Baixar Relatório CSV", data=csv, file_name="relatorio_selecoes.csv", mime="text/csv")
+
+# Fase 2 - Visualização de Horários dos Professores
 
 st.title("Fase 2: Visualização de Horários dos Professores")
 
