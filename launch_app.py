@@ -209,17 +209,18 @@ if nome_preenchedor == "Bruno":
         if cols[len(row)].button("Deletar", key=f"delete_{i}"):
             deletar_linha(i)
 
-# Botão para exportar os dados para Excel
-st.subheader("Exportar Dados para Excel")
-if st.button("Exportar para Excel"):
-    buffer = io.BytesIO()
-    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-        st.session_state.df_disponibilidade.to_excel(writer, index=False, sheet_name='Disponibilidade')
-    buffer.seek(0)
-    
-    st.download_button(
-        label="Baixar Excel",
-        data=buffer,
-        file_name="disponibilidade_professores.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+# Botão para exportar os dados para Excel, visível apenas para Bruno
+if nome_preenchedor == "Bruno":
+    st.subheader("Exportar Dados para Excel")
+    if st.button("Exportar para Excel"):
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+            st.session_state.df_disponibilidade.to_excel(writer, index=False, sheet_name='Disponibilidade')
+        buffer.seek(0)
+        
+        st.download_button(
+            label="Baixar Excel",
+            data=buffer,
+            file_name="disponibilidade_professores.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
