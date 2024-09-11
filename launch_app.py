@@ -195,10 +195,11 @@ if st.button("Salvar dados"):
     salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
 
-# Exibir a tabela com os botões de deletar apenas se o nome do preenchedor for "Bruno"
-if nome_preenchedor == "BrunoMorgilloCoordenadorSUPERADMIN",
-if nome_preenchedor == "LuizaDiretoraSUPERADMIN",
-if nome_preenchedor == "EleyneDiretoraSUPERADMIN":
+# Definir uma lista de usuários com permissões especiais
+usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
+
+# Verificar se o nome do preenchedor está na lista de usuários com permissões especiais
+if nome_preenchedor in usuarios_superadmin:
     st.subheader("Tabela Atualizada de Disponibilidade")
 
     # Iterar sobre as linhas do DataFrame e exibir as informações com botões de deletar
@@ -207,14 +208,11 @@ if nome_preenchedor == "EleyneDiretoraSUPERADMIN":
         for j, value in enumerate(row):
             cols[j].write(value)
         
-        # Exibir o botão de deletar apenas se o nome do preenchedor for "Bruno"
+        # Exibir o botão de deletar apenas se o nome do preenchedor estiver na lista de permissões
         if cols[len(row)].button("Deletar", key=f"delete_{i}"):
             deletar_linha(i)
 
-# Botão para exportar os dados para Excel, visível apenas para Bruno
-if nome_preenchedor == "BrunoMorgilloCoordenadorSUPERADMIN",
-if nome_preenchedor == "LuizaDiretoraSUPERADMIN",
-if nome_preenchedor == "EleyneDiretoraSUPERADMIN":
+    # Botão para exportar os dados para Excel, visível para todos os usuários na lista de permissões especiais
     st.subheader("Exportar Dados para Excel")
     if st.button("Exportar para Excel"):
         buffer = io.BytesIO()
