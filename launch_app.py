@@ -198,15 +198,14 @@ if st.button("Salvar dados"):
 # Exibir a tabela com os botões de deletar
 st.subheader("Tabela Atualizada de Disponibilidade")
 
+# Iterar sobre as linhas do DataFrame e exibir as informações com botões de deletar
 for i, row in st.session_state.df_disponibilidade.iterrows():
     cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
     for j, value in enumerate(row):
-        # Evitando a exibição de NaN
-        if pd.isna(value):
-            cols[j].write("")  # Evita escrever NaN
-        else:
-            cols[j].write(value)
-    if cols[len(row)].button("Deletar", key=f"delete_{i}"):
+        cols[j].write(value)
+    
+    # Exibir o botão de deletar apenas se o nome do preenchedor for "Bruno"
+    if nome_preenchedor == "Bruno" and cols[len(row)].button("Deletar", key=f"delete_{i}"):
         deletar_linha(i)
 
 # Botão para exportar os dados para Excel
