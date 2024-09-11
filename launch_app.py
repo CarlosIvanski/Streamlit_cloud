@@ -3,14 +3,6 @@ import pandas as pd
 import os
 import io
 from datetime import datetime
-from streamlit_gsheets import GSheetsConnection
-
-# Create a connection object.
-conn = st.connection("gsheets", type=GSheetsConnection)
-
-# .streamlit/secrets.toml
-[connections.gsheets]
-spreadsheet = "https://docs.google.com/spreadsheets/d/1KqpZSsnNsDzcb-I75ys0-RmByKSiMtLv6r41-GHk8bE/edit?gid=0#gid=0"
 
 # Função para carregar os dados de um arquivo CSV
 def carregar_dados():
