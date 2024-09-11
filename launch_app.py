@@ -46,7 +46,7 @@ else:
     st.warning("Por favor, preencha seu nome para continuar.")
 
 # Nomes iniciais dos professores
-nomes_iniciais = ['Pessoa A', 'Pessoa B', 'Pessoa C', 'Pessoa D']
+nomes_iniciais = ['Pessoa A']
 
 # Lista de unidades
 unidades = ['Satélite', 'Vicentina', 'Jardim', 'Online']
