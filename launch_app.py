@@ -39,12 +39,6 @@ data_modificada_formatada = data_modificacao.strftime("%d/%m/%Y")
 
 st.write(f"Data selecionada: {data_modificada_formatada}")
 
-# Garantir que um nome seja fornecido
-if nome_preenchedor:
-    st.write(f"Obrigado, {nome_preenchedor}, suas respostas foram registradas!")
-else:
-    st.warning("Por favor, preencha seu nome para continuar.")
-
 # Nomes iniciais dos professores
 nomes_iniciais = ['Pessoa A']
 
