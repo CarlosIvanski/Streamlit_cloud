@@ -181,6 +181,7 @@ def converter_para_dataframe(dados, nome_usuario, data):
             'Módulo': ', '.join(detalhes['Modulo']),
             'Observações': detalhes.get('Observações', ''),
             'Nome do Preenchendor': nome_usuario,
+            'Data': data.strftime('%Y-%m-%d')
         }
         registros.append(registro)
     return pd.DataFrame(registros)
