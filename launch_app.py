@@ -196,7 +196,7 @@ if st.button("Salvar dados"):
     st.success("Dados salvos com sucesso!")
 
 # Definir uma lista de usuários com permissões especiais
-usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
+usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
 
 # Verificar se o nome do preenchedor está na lista de usuários com permissões especiais
 if nome_preenchedor in usuarios_superadmin:
