@@ -3,6 +3,16 @@ import pandas as pd
 import os
 import io
 from datetime import datetime
+from streamlit_gsheets import GSheetsConnection
+
+# example/st_app.py
+
+url = "https://docs.google.com/spreadsheets/d/1KqpZSsnNsDzcb-I75ys0-RmByKSiMtLv6r41-GHk8bE/edit?usp=sharing"
+
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+data = conn.read(spreadsheet=url)
+st.dataframe(data)
 
 # Função para carregar os dados de um arquivo CSV
 def carregar_dados():
