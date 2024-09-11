@@ -2,6 +2,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 import streamlit as st
+import io
 
 # Função para conectar ao Google Sheets usando as credenciais
 def conectar_google_sheets():
