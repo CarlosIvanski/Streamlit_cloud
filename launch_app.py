@@ -4,9 +4,6 @@ import os
 import io
 from datetime import datetime
 
-var response = UrlFetchApp.fetch("https://docs.google.com/spreadsheets/d/1KqpZSsnNsDzcb-I75ys0-RmByKSiMtLv6r41-GHk8bE/edit?gid=0#gid=0/");
-Logger.log(response.getAllHeaders());
-
 # Função para carregar os dados de um arquivo CSV
 def carregar_dados():
     if os.path.exists("disponibilidade.csv"):
