@@ -195,18 +195,21 @@ if st.button("Salvar dados"):
     salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
 
-# Exibir a tabela com os botões de deletar
-st.subheader("Tabela Atualizada de Disponibilidade")
+# Exibir a tabela com os botões de deletar apenas se o nome do preenchedor for "Bruno"
+if nome_preenchedor == "Bruno":
+    st.subheader("Tabela Atualizada de Disponibilidade")
 
-# Iterar sobre as linhas do DataFrame e exibir as informações com botões de deletar
-for i, row in st.session_state.df_disponibilidade.iterrows():
-    cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
-    for j, value in enumerate(row):
-        cols[j].write(value)
-    
-    # Exibir o botão de deletar apenas se o nome do preenchedor for "Bruno"
-    if nome_preenchedor == "Bruno" and cols[len(row)].button("Deletar", key=f"delete_{i}"):
-        deletar_linha(i)
+    # Iterar sobre as linhas do DataFrame e exibir as informações com botões de deletar
+    for i, row in st.session_state.df_disponibilidade.iterrows():
+        cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
+        for j, value in enumerate(row):
+            cols[j].write(value)
+        
+        # Exibir o botão de deletar apenas se o nome do preenchedor for "Bruno"
+        if cols[len(row)].button("Deletar", key=f"delete_{i}"):
+            deletar_linha(i)
+else:
+    st.warning("Você não tem permissão para visualizar esta tabela.")
 
 # Botão para exportar os dados para Excel
 st.subheader("Exportar Dados para Excel")
