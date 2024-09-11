@@ -1,29 +1,37 @@
 import streamlit as st
 import pandas as pd
-import os
-import io
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+from io import BytesIO
 from datetime import datetime
 
-# Função para carregar os dados de um arquivo CSV
-def carregar_dados():
-    if os.path.exists("disponibilidade.csv"):
-        return pd.read_csv("disponibilidade.csv")
-    else:
-        return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações', 'Nome do Preenchendor', 'Data'])
+# Configuração das credenciais e conexão com o Google Sheets
+def conectar_google_sheets():
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name("caminho/para/seu/arquivo-credenciais.json", scope)
+    client = gspread.authorize(creds)
+    return client
 
-# Função para salvar dados em um arquivo CSV
-def salvar_dados(df):
-    df.to_csv("disponibilidade.csv", index=False)
+# Função para carregar dados do Google Sheets
+def carregar_dados_google_sheets(sheet_id):
+    client = conectar_google_sheets()
+    sheet = client.open_by_key(sheet_id).sheet1
+    data = sheet.get_all_records()
+    return pd.DataFrame(data)
 
-# Função para deletar uma linha específica
-def deletar_linha(index):
-    st.session_state.df_disponibilidade = st.session_state.df_disponibilidade.drop(index).reset_index(drop=True)
-    salvar_dados(st.session_state.df_disponibilidade)
-    st.success(f"Linha {index} deletada com sucesso!")
+# Função para salvar dados no Google Sheets
+def salvar_dados_google_sheets(df, sheet_id):
+    client = conectar_google_sheets()
+    sheet = client.open_by_key(sheet_id).sheet1
+    sheet.clear()
+    sheet.update([df.columns.values.tolist()] + df.values.tolist())
 
-# Carregar os dados salvos (se houver) ao iniciar a aplicação
+# ID da planilha do Google Sheets
+sheet_id = "1KqpZSsnNsDzcb-I75ys0-RmByKSiMtLv6r41-GHk8bE"
+
+# Carregar dados do Google Sheets ao iniciar a aplicação
 if 'df_disponibilidade' not in st.session_state:
-    st.session_state.df_disponibilidade = carregar_dados()
+    st.session_state.df_disponibilidade = carregar_dados_google_sheets(sheet_id)
 
 # Título do dashboard
 st.title("Dashboard de Disponibilidade")
@@ -174,55 +182,35 @@ def converter_para_dataframe(dados, nome_usuario, data):
     for professor, detalhes in dados.items():
         registro = {
             'Professor': professor,
-            'Unidades': ', '.join([unidade for unidade, selecionado in detalhes.items() if unidade in unidades and selecionado]),
-            'Carro': 'Sim' if detalhes.get('Carro', False) else 'Não',
-            'Máquinas': ', '.join(detalhes['Máquina']),
-            'Disponibilidade': ', '.join(detalhes['Disponibilidade']),
-            'Módulo': ', '.join(detalhes['Modulo']),
+            'Unidades': ', '.join([unidade for unidade, valor in detalhes.items() if valor and unidade in unidades]),
+            'Carro': 'Sim' if detalhes.get('Carro') else 'Não',
+            'Máquinas': ', '.join(detalhes.get('Máquina', [])),
+            'Disponibilidade': ', '.join(detalhes.get('Disponibilidade', [])),
+            'Módulo': ', '.join(detalhes.get('Modulo', [])),
             'Observações': detalhes.get('Observações', ''),
             'Nome do Preenchendor': nome_usuario,
-            'Data': data.strftime('%Y-%m-%d')  # Garantindo que a data seja formatada sem hora
+            'Data': data
         }
         registros.append(registro)
     return pd.DataFrame(registros)
 
-# Converter os dados coletados para um DataFrame
-df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
+# Exibir a tabela de dados atualizada
+st.subheader("Tabela Atualizada de Disponibilidade:")
+df_disponibilidade = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificada_formatada)
 
-# Botão para salvar os dados na tabela em tempo real
-if st.button("Salvar dados"):
-    st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo], ignore_index=True)
-    salvar_dados(st.session_state.df_disponibilidade)
-    st.success("Dados salvos com sucesso!")
+# Exibir a tabela
+st.dataframe(df_disponibilidade)
 
-# Definir uma lista de usuários com permissões especiais
-usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
+# Verifica se há dados novos para salvar
+if st.button("Salvar Dados"):
+    st.session_state.df_disponibilidade = df_disponibilidade
+    salvar_dados_google_sheets(st.session_state.df_disponibilidade, sheet_id)
+    st.success("Dados salvos no Google Sheets com sucesso!")
 
-# Verificar se o nome do preenchedor está na lista de usuários com permissões especiais
-if nome_preenchedor in usuarios_superadmin:
-    st.subheader("Tabela Atualizada de Disponibilidade")
-
-    # Iterar sobre as linhas do DataFrame e exibir as informações com botões de deletar
-    for i, row in st.session_state.df_disponibilidade.iterrows():
-        cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
-        for j, value in enumerate(row):
-            cols[j].write(value)
-        
-        # Exibir o botão de deletar apenas se o nome do preenchedor estiver na lista de permissões
-        if cols[len(row)].button("Deletar", key=f"delete_{i}"):
-            deletar_linha(i)
-
-    # Botão para exportar os dados para Excel, visível para todos os usuários na lista de permissões especiais
-    st.subheader("Exportar Dados para Excel")
-    if st.button("Exportar para Excel"):
-        buffer = io.BytesIO()
-        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-            st.session_state.df_disponibilidade.to_excel(writer, index=False, sheet_name='Disponibilidade')
-        buffer.seek(0)
-        
-        st.download_button(
-            label="Baixar Excel",
-            data=buffer,
-            file_name="disponibilidade_professores.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+# Função para deletar linha, só disponível para Bruno
+if nome_preenchedor == "Bruno":
+    linha_para_deletar = st.number_input("Insira o índice da linha para deletar:", min_value=0, max_value=len(st.session_state.df_disponibilidade)-1, step=1)
+    if st.button("Deletar Linha"):
+        deletar_linha(linha_para_deletar)
+else:
+    st.warning("Você não tem permissão para deletar dados.")
