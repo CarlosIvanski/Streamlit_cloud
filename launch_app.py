@@ -1,8 +1,29 @@
-import streamlit as st
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
-import os
-import io
-from datetime import datetime
+import streamlit as st
+
+# Função para conectar ao Google Sheets usando as credenciais
+def conectar_google_sheets():
+    # Define o escopo de acesso necessário
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    # Cria as credenciais a partir do arquivo JSON
+    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+    # Autoriza o cliente usando as credenciais
+    client = gspread.authorize(creds)
+    return client
+
+def atualizar_google_sheets(df):
+    client = conectar_google_sheets()
+    # Abre a planilha pelo ID (extraído da URL)
+    sheet = client.open_by_key("1KqpZSsnNsDzcb-I75ys0-RmByKSiMtLv6r41-GHk8bE").sheet1
+    sheet.clear()  # Limpa a planilha antes de atualizar
+    sheet.update([df.columns.values.tolist()] + df.values.tolist())  # Atualiza a planilha com os dados
+
+# Exemplo de botão no Streamlit para atualizar o Google Sheets
+if st.button("Atualizar Google Sheets"):
+    atualizar_google_sheets(st.session_state.df_disponibilidade)
+    st.success("Dados atualizados no Google Sheets com sucesso!")
 
 # Função para carregar os dados de um arquivo CSV
 def carregar_dados():
