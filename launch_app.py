@@ -88,7 +88,7 @@ for i, nome_inicial in enumerate(nomes_iniciais):
     cols = st.columns(col_widths)
 
     with cols[0]:
-        nome_professor = st.text_input(f"Nome do professor {i + 1}:", nome_inicial, key=f"nome_{i}")
+        nome_professor = st.text_input(f"Nome do professor", nome_inicial, key=f"nome_{i}")
 
     # Atualiza o nome do professor no session state
     if nome_professor != nome_inicial:
