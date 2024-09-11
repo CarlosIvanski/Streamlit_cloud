@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 import io
 import os
+from datetime import datetime
 
 # Função para conectar ao Google Sheets usando as credenciais
 def conectar_google_sheets():
