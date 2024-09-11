@@ -181,7 +181,7 @@ def converter_para_dataframe(dados, nome_usuario, data):
             'Módulo': ', '.join(detalhes['Modulo']),
             'Observações': detalhes.get('Observações', ''),
             'Nome do Preenchendor': nome_usuario,
-            'Data': data.strftime('%Y-%m-%d')
+            'Data': data.strftime('%Y-%m-%d')  # Garantindo que a data seja formatada sem hora
         }
         registros.append(registro)
     return pd.DataFrame(registros)
@@ -191,18 +191,21 @@ df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenc
 
 # Botão para salvar os dados na tabela em tempo real
 if st.button("Salvar dados"):
-    st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo]).drop_duplicates().reset_index(drop=True)
+    st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo], ignore_index=True)
     salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
 
-# Exibir a tabela atualizada no site com bordas e botão de deletar
+# Exibir a tabela com os botões de deletar
 st.subheader("Tabela Atualizada de Disponibilidade")
 
-# Exibir a tabela com os botões de deletar
 for i, row in st.session_state.df_disponibilidade.iterrows():
     cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
     for j, value in enumerate(row):
-        cols[j].write(value)
+        # Evitando a exibição de NaN
+        if pd.isna(value):
+            cols[j].write("")  # Evita escrever NaN
+        else:
+            cols[j].write(value)
     if cols[len(row)].button("Deletar", key=f"delete_{i}"):
         deletar_linha(i)
 
