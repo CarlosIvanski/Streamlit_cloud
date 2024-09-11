@@ -59,7 +59,7 @@ if 'disponibilidade' not in st.session_state:
 st.subheader("Tabela de Disponibilidade:")
 
 # Define a largura das colunas
-col_widths = [1, 1.5, 1, 1.5, 1, 1.5, 2]
+col_widths = [1, 1, 1, 1, 1, 1, 1]
 
 # Adicionando CSS para melhorar a visualização
 st.markdown(
