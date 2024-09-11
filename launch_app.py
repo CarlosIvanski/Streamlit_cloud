@@ -196,7 +196,7 @@ if st.button("Salvar dados"):
     st.success("Dados salvos com sucesso!")
 
 # Exibir a tabela com os botões de deletar apenas se o nome do preenchedor for "Bruno"
-if nome_preenchedor == "Bruno":
+if nome_preenchedor == "BrunoMorgilloCoordenadorSUPERADMIN":
     st.subheader("Tabela Atualizada de Disponibilidade")
 
     # Iterar sobre as linhas do DataFrame e exibir as informações com botões de deletar
@@ -210,7 +210,7 @@ if nome_preenchedor == "Bruno":
             deletar_linha(i)
 
 # Botão para exportar os dados para Excel, visível apenas para Bruno
-if nome_preenchedor == "Bruno":
+if nome_preenchedor == "BrunoMorgilloCoordenadorSUPERADMIN":
     st.subheader("Exportar Dados para Excel")
     if st.button("Exportar para Excel"):
         buffer = io.BytesIO()
