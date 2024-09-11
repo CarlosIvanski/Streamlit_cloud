@@ -9,7 +9,7 @@ def carregar_dados():
     if os.path.exists("disponibilidade.csv"):
         return pd.read_csv("disponibilidade.csv")
     else:
-        return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações', 'Nome do Preenchendor', 'Data', 'Hora'])
+        return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações', 'Nome do Preenchendor', 'Data'])
 
 # Função para salvar dados em um arquivo CSV
 def salvar_dados(df):
@@ -175,7 +175,7 @@ for i, nome_inicial in enumerate(nomes_iniciais):
         st.session_state.disponibilidade[nome_professor]['Observações'] = observacoes
 
 # Função para converter os dados para DataFrame
-def converter_para_dataframe(dados, nome_usuario, data, hora):
+def converter_para_dataframe(dados, nome_usuario, data):
     registros = []
     for professor, detalhes in dados.items():
         registro = {
@@ -187,14 +187,13 @@ def converter_para_dataframe(dados, nome_usuario, data, hora):
             'Módulo': ', '.join(detalhes['Modulo']),
             'Observações': detalhes.get('Observações', ''),
             'Nome do Preenchendor': nome_usuario,
-            'Data': data.strftime('%Y-%m-%d'),
-            'Hora': hora.strftime('%H:%M')
+            'Data': data.strftime('%Y-%m-%d')
         }
         registros.append(registro)
     return pd.DataFrame(registros)
 
 # Converter os dados coletados para um DataFrame
-df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao, hora_modificacao)
+df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
 
 # Botão para salvar os dados na tabela em tempo real
 if st.button("Salvar dados"):
