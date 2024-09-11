@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import io
 from datetime import datetime
+from PIL import Image
 
 # Função para carregar os dados de um arquivo CSV
 def carregar_dados():
