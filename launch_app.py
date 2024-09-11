@@ -3,6 +3,10 @@ import pandas as pd
 import os
 import io
 from datetime import datetime
+from streamlit_gsheets import GSheetsConnection
+
+# Create a connection object.
+conn = st.connection("gsheets", type=GSheetsConnection)
 
 # .streamlit/secrets.toml
 [connections.gsheets]
