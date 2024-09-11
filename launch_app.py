@@ -208,8 +208,6 @@ if nome_preenchedor == "Bruno":
         # Exibir o botão de deletar apenas se o nome do preenchedor for "Bruno"
         if cols[len(row)].button("Deletar", key=f"delete_{i}"):
             deletar_linha(i)
-else:
-    st.warning("Você não tem permissão para visualizar esta tabela.")
 
 # Botão para exportar os dados para Excel
 st.subheader("Exportar Dados para Excel")
