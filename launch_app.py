@@ -34,7 +34,10 @@ nome_preenchedor = st.text_input("Digite seu nome:")
 # Coleta a data da modificação
 data_modificacao = st.date_input("Data da modificação", value=datetime.today())
 
-st.write(f"Data selecionada: {data_modificacao}")
+# Formata a data para DD/MM/YYYY
+data_modificada_formatada = data_modificacao.strftime("%d/%m/%Y")
+
+st.write(f"Data selecionada: {data_modificada_formatada}")
 
 # Garantir que um nome seja fornecido
 if nome_preenchedor:
