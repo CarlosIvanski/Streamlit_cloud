@@ -1,0 +1,61 @@
+Condições:
+
+    Condição 1: IP
+        1.1 if o IP do professor for = 5, professor merece ter mais aulas,
+        1.2 if o IP do professor for < 5, professor merece aulas necessárias,
+        1.3 Quanto menor o IP do professor, menos aula ele recebe.
+
+    Condição 2: Horários
+        2.1 if professor ter mais disponibilidade == ter mais quantidade de aulas;
+        2.2 if professor ter menos disponibilidade == ter menos quantidade de aulas;
+        2.3 disponibilidade obrigatória == '18:00', '19:00' e '20:00';
+        2.4 if professor não tiver disponibilidade de manhã, não alocar o professor em turmas na parte da manhã;
+        2.5 if professor não tiver disponibilidade de tarde, não alocar o professor em turmas na parte da tarde;
+        2.6 if professor não tiver disponibilidade de sábado, não alocar o professor em turmas no sábado;
+        2.7 if professor alocado em uma turma, não ser alocado em outra turma no mesmo horário.
+
+    Condição 3: Idioma
+        3.1 if professor ter idioma == 1 (ingles), ser alocado apenas em turmas de Inglês;
+        3.2 if professor ter idioma == 2 (espanhol), ser alocado apenas em turmas de Espanhol;
+        3.3 if professor ter idioma == 1 and 2, ser alocado tanto no Inglês quanto no Espanhol, priorizando o Inglês.
+
+    Condição 4: Máquina
+        4.1 if professor não ter notebook, não dar aula online na alocação presencial;
+        4.2 if professor não ter notebook mas ter Desktop, aulas online apenas sem alocação presencial;
+        4.3 if professor não ter notebook or Desktop, não dar aulas online.
+
+    Condição 5: Deslocamento
+        5.1 if professor não ter carro, não colocar no grupo Delta;
+        5.2 if professor não ter carro, priorizar apenas uma unidade.
+
+    Condição 6: Módulos de aprendizado
+        6.1 if professor não puder lecionar o stage 1, não alocar o professor em turmas de stage 1;
+        6.2 if professor não puder lecionar VIP's, não alocar o professor em turmas VIP's;
+        6.3 if professor não puder lecionar IN-COMPANY, não alocar o professor em turmas IN-COMPANY;
+        6.4 if professor não puder lecionar Kids, não alocar o professor em turmas Kids;
+        6.5 if professor não puder lecionar grupos de Conversation, não alocar o professor em turmas de Conversation.
+        
+    Condição 7: Logística
+        7.1 if professor tiver uma aula presencial, realocar para online, fator logística.
+
+    Condição 8: Unidades
+        8.1 alocar professores apenas nas unidades que ele possa frequentar;
+        8.2 aqueles professores que não podem ir à unidades presenciais, para não serem alocados em unidades presenciais.
+
+    Condição 9: Férias
+        9.1 if professor de férias == não deverá ser alocado.
+
+    Condição 10: Atestado
+        10.1 if professor portar atestado de longo prazo, não ser alocado em turmas.
+
+    Condição 11: Afastado
+        11.1 if professor estiver afastado, não ser alocado em turmas.
+
+    Condição 12: Tempo de casa (EXP)
+        12.1 Professores com tempo de casa deverão receber mais aulas.
+
+    Condição 13: Professores disponíveis
+        13.1 if professor está disponível, colocar em reserva caso precise.
+
+    Condição 14: Proibições
+        14.1 if professor está restringido de uma turma, não alocar ele nessa turma.
